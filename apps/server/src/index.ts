@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import cardsRouter from './routes/cards'
 import authRouter from './routes/auth'
 import readingsRouter from './routes/readings'
+import interpretRouter from './routes/interpret'
 import { errorHandler } from './middleware/errorHandler'
 
 dotenv.config()
@@ -27,7 +28,7 @@ app.get('/health', (_req, res) => {
 app.use('/cards', cardsRouter)
 app.use('/auth', authRouter)
 app.use('/readings', readingsRouter)
-
+app.use('/interpret', interpretRouter)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
