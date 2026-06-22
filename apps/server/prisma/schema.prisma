@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String
+  isDefault   Boolean @default(false)
+  cards       Card[]
+}
+
+model Card {
+  id              String        @id @default(uuid())
+  nameRu          String
+  nameEn          String
+  arcana          Arcana
+  suit            Suit?
+  number          Int
+  meaningUpright  Json
+  meaningReversed Json
+  description     String
+  imageUrl        String
+  keywords        String[]
+  deckId          String
+  deck            Deck          @relation(fields: [deckId], references: [id])
+  readings        ReadingCard[]
+  cardMeanings    CardMeaning[]
+}
+
+model CardMeaning {
+  id              String          @id @default(uuid())
+  cardId          String
+  card            Card            @relation(fields: [cardId], references: [id])
+  positionContext PositionContext
+  meaningText     String
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  readings     Reading[]
+}
+
+model Reading {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  spreadType     SpreadType
+  question       String?
+  interpretation String?
+  createdAt      DateTime      @default(now())
+  cards          ReadingCard[]
+}
+
+model ReadingCard {
+  id         String  @id @default(uuid())
+  readingId  String
+  reading    Reading @relation(fields: [readingId], references: [id], onDelete: Cascade)
+  cardId     String
+  card       Card    @relation(fields: [cardId], references: [id])
+  position   String
+  isReversed Boolean @default(false)
+  order      Int
+}
+
+enum Arcana {
+  MAJOR
+  MINOR
+}
+
+enum Suit {
+  WANDS
+  CUPS
+  SWORDS
+  PENTACLES
+}
+
+enum SpreadType {
+  THREE_CARD
+  CELTIC_CROSS
+  SINGLE
+  HORSESHOE
+}
+
+enum PositionContext {
+  PAST
+  PRESENT
+  FUTURE
+  SELF
+  SITUATION
+  ADVICE
+  OUTCOME
+  CHALLENGE
+  FOUNDATION
+  HOPES
+}
